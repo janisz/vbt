@@ -1,0 +1,83 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --primary: #0f3460;
+  --accent: #e94560;
+  --text: #eee;
+  --text-muted: #888;
+  --green: #4caf50;
+  --yellow: #ff9800;
+  --red: #f44336;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100dvh;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  min-height: 100dvh;
+}
+
+button {
+  background: var(--primary);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  touch-action: manipulation;
+}
+
+button:active { opacity: 0.8; }
+
+.btn-accent {
+  background: var(--accent);
+  font-size: 20px;
+  font-weight: 700;
+  padding: 18px;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border: 1px solid var(--primary);
+}
+
+h1 { font-size: 24px; margin-bottom: 16px; }
+h2 { font-size: 18px; margin-bottom: 12px; }
+
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.session-list { list-style: none; }
+
+.session-item {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.session-item:active { opacity: 0.8; }
+
+.text-muted { color: var(--text-muted); font-size: 14px; }
+
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.gap-8 { display: flex; flex-direction: column; gap: 8px; }
