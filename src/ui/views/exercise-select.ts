@@ -7,6 +7,7 @@ import {
 } from "../../exercises/exercises.js";
 import type { ExerciseEntry } from "../../exercises/exercises.js";
 import type { Router } from "../router.js";
+import { escapeHtml } from "../../utils/escape.js";
 
 export function renderExerciseSelect(
   container: HTMLElement,
@@ -51,9 +52,9 @@ export function renderExerciseSelect(
     list.innerHTML = display
       .map(
         (e) => `
-      <li class="session-item" data-id="${e.id}" data-name="${e.name}">
-        <div>${e.name}</div>
-        <div class="text-muted">${e.equipment} · ${e.bodyPart} · ${e.target}</div>
+      <li class="session-item" data-id="${escapeHtml(e.id)}" data-name="${escapeHtml(e.name)}">
+        <div>${escapeHtml(e.name)}</div>
+        <div class="text-muted">${escapeHtml(e.equipment)} · ${escapeHtml(e.bodyPart)} · ${escapeHtml(e.target)}</div>
       </li>`,
       )
       .join("");

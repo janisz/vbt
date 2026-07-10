@@ -1,5 +1,4 @@
 import type { FusedSample, DetectedRep, RepAnalysis, SetAnalysis } from "../types.js";
-import { getReferencePath } from "./reference-paths.js";
 
 export function analyzeRep(rep: DetectedRep, samples: FusedSample[]): RepAnalysis {
   const repSamples = samples.filter(
@@ -74,7 +73,7 @@ export function analyzeSet(reps: RepAnalysis[]): SetAnalysis {
   return { reps, velocityLoss, estimatedRIR, vbtZone, repConsistency };
 }
 
-function classifyZone(mcv: number): string {
+export function classifyZone(mcv: number): string {
   if (mcv < 0.35) return "maximal-strength";
   if (mcv < 0.5) return "accelerative-strength";
   if (mcv < 0.75) return "strength-speed";

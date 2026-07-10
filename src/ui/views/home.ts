@@ -1,5 +1,6 @@
 import { getSessions } from "../../storage/db.js";
 import type { Router } from "../router.js";
+import { escapeHtml } from "../../utils/escape.js";
 
 export async function renderHome(
   container: HTMLElement,
@@ -20,7 +21,7 @@ export async function renderHome(
                 (s) => `
               <li class="session-item" data-id="${s.id}">
                 <div>${new Date(s.date).toLocaleDateString()}</div>
-                ${s.notes ? `<div class="text-muted">${s.notes}</div>` : ""}
+                ${s.notes ? `<div class="text-muted">${escapeHtml(s.notes)}</div>` : ""}
               </li>`,
               )
               .join("")}</ul>`

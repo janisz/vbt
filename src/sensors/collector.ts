@@ -44,6 +44,8 @@ export class SensorCollector {
   }
 
   private handleDeviceMotion(e: DeviceMotionEvent): void {
+    const DEG_TO_RAD = Math.PI / 180;
+
     const sample: SensorSample = {
       timestamp: performance.now(),
       acceleration: e.acceleration
@@ -58,9 +60,9 @@ export class SensorCollector {
         : ZERO_VEC3,
       rotationRate: e.rotationRate
         ? {
-            x: e.rotationRate.alpha ?? 0,
-            y: e.rotationRate.beta ?? 0,
-            z: e.rotationRate.gamma ?? 0,
+            x: (e.rotationRate.beta ?? 0) * DEG_TO_RAD,
+            y: (e.rotationRate.gamma ?? 0) * DEG_TO_RAD,
+            z: (e.rotationRate.alpha ?? 0) * DEG_TO_RAD,
           }
         : ZERO_VEC3,
     };

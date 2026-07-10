@@ -10,8 +10,6 @@ import { FusionEngine } from "../fusion/engine.js";
 import { RepDetector } from "../detector/rep-detector.js";
 import { analyzeRep, analyzeSet } from "../analyzer/movement-analyzer.js";
 
-const AUTO_STOP_IDLE_MS = 5000;
-
 export class Recorder {
   private fusion = new FusionEngine();
   private detector: RepDetector | null = null;

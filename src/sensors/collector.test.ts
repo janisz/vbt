@@ -61,9 +61,9 @@ describe("SensorCollector", () => {
     expect(s.acceleration.x).toBe(1);
     expect(s.acceleration.y).toBe(2);
     expect(s.acceleration.z).toBe(3);
-    expect(s.rotationRate.x).toBeCloseTo(0.1);
-    expect(s.rotationRate.y).toBeCloseTo(0.2);
-    expect(s.rotationRate.z).toBeCloseTo(0.3);
+    expect(s.rotationRate.x).toBeCloseTo(0.2 * (Math.PI / 180));
+    expect(s.rotationRate.y).toBeCloseTo(0.3 * (Math.PI / 180));
+    expect(s.rotationRate.z).toBeCloseTo(0.1 * (Math.PI / 180));
     expect(s.timestamp).toBeGreaterThan(0);
   });
 

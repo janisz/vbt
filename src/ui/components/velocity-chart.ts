@@ -1,4 +1,5 @@
 import type { RepAnalysis } from "../../types.js";
+import { classifyZone } from "../../analyzer/movement-analyzer.js";
 
 const ZONE_COLORS: Record<string, string> = {
   "maximal-strength": "#f44336",
@@ -7,14 +8,6 @@ const ZONE_COLORS: Record<string, string> = {
   power: "#4caf50",
   "speed-strength": "#2196f3",
 };
-
-function zoneForVelocity(mcv: number): string {
-  if (mcv < 0.35) return "maximal-strength";
-  if (mcv < 0.5) return "accelerative-strength";
-  if (mcv < 0.75) return "strength-speed";
-  if (mcv < 1.0) return "power";
-  return "speed-strength";
-}
 
 export function renderVelocityChart(
   container: HTMLElement,
@@ -38,7 +31,7 @@ export function renderVelocityChart(
     .map((r, i) => {
       const y = i * (barHeight + gap);
       const width = (r.meanConcentricVelocity / maxV) * chartWidth;
-      const zone = zoneForVelocity(r.meanConcentricVelocity);
+      const zone = classifyZone(r.meanConcentricVelocity);
       const color = ZONE_COLORS[zone] ?? "#888";
       return `
         <text x="${labelWidth - 4}" y="${y + barHeight / 2 + 5}" text-anchor="end" fill="#888" font-size="12">R${r.repNumber}</text>
