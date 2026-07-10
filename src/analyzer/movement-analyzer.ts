@@ -25,7 +25,9 @@ export function analyzeRep(rep: DetectedRep, samples: FusedSample[]): RepAnalysi
   const peakConcentricVelocity =
     concentricVelocities.length > 0 ? Math.max(...concentricVelocities) : 0;
 
-  const barPath = repSamples.map((s) => ({ x: s.position.x, y: s.position.z }));
+  const rawBarPath = repSamples.map((s) => ({ x: s.position.x, y: s.position.z }));
+  const origin = rawBarPath[0] ?? { x: 0, y: 0 };
+  const barPath = rawBarPath.map((p) => ({ x: p.x - origin.x, y: p.y - origin.y }));
 
   const tilts = repSamples.map((s) => Math.abs(s.tilt.roll));
   const maxTilt =

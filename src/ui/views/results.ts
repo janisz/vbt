@@ -2,6 +2,7 @@ import type { SetAnalysis, Session, WorkoutSet } from "../../types.js";
 import { saveSession, saveSet } from "../../storage/db.js";
 import { renderVelocityChart } from "../components/velocity-chart.js";
 import { renderBarPathChart } from "../components/bar-path-chart.js";
+import { shareResults } from "../components/share.js";
 import type { Router } from "../router.js";
 
 function qualityDot(value: number, thresholds: [number, number]): string {
@@ -81,6 +82,7 @@ export function renderResults(
 
     <div class="gap-8 mt-16">
       <button class="btn-accent" id="save-new">Save & New Set</button>
+      <button class="btn-secondary" id="share-results">Share</button>
       <button class="btn-secondary" id="end-session">End Session</button>
     </div>
     <div style="text-align:center;margin-top:24px;opacity:0.3;font-size:12px;">VBT</div>
@@ -95,6 +97,17 @@ export function renderResults(
     analysis.reps,
     exerciseKey,
   );
+
+  container.querySelector("#share-results")!.addEventListener("click", () => {
+    const summary = [
+      `${exerciseName}${weight ? ` — ${weight}kg` : ""}`,
+      `Reps: ${analysis.reps.length}`,
+      `Best MCV: ${bestMCV.toFixed(2)} m/s`,
+      `Velocity Loss: ${analysis.velocityLoss.toFixed(0)}%`,
+      `Zone: ${analysis.vbtZone}`,
+    ].join("\n");
+    shareResults(container, summary);
+  });
 
   container.querySelector("#save-new")!.addEventListener("click", async () => {
     await saveCurrentSet(analysis, exerciseId, exerciseName, weight);
