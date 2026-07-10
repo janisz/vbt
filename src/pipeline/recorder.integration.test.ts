@@ -75,4 +75,23 @@ describe("Recorder integration with real sensor data", () => {
       expect(rep.peakConcentricVelocity).toBeLessThan(5.0);
     }
   });
+
+  it("detects reps from second recorded bodyweight squats session", () => {
+    const data = loadFixture("vbt-squats-10-1783694621331.json");
+    const recorder = new Recorder();
+    recorder.start("eccentric-first");
+
+    for (const sample of data.samples) {
+      recorder.ingestSample(sample);
+    }
+
+    const result = recorder.stop();
+
+    expect(result.reps.length).toBe(9);
+
+    for (const rep of result.reps) {
+      expect(rep.meanConcentricVelocity).toBeGreaterThan(0);
+      expect(rep.peakConcentricVelocity).toBeGreaterThan(0);
+    }
+  });
 });
