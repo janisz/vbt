@@ -51,9 +51,9 @@ export class Recorder {
     );
 
     // Stillness-based ZUPT: prevent velocity drift from accelerometer noise
-    if (accelMag < 0.3) {
+    if (accelMag < 0.5) {
       if (this.stillSince === null) this.stillSince = sample.timestamp;
-      if (sample.timestamp - this.stillSince > 200) {
+      if (sample.timestamp - this.stillSince > 100) {
         this.fusion.applyZUPT();
       }
     } else {

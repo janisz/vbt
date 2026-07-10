@@ -82,9 +82,9 @@ export function renderDebug(
       sample.acceleration.z ** 2,
     );
 
-    if (accelMag < 0.3) {
+    if (accelMag < 0.5) {
       if (stillSince === null) stillSince = sample.timestamp;
-      if (sample.timestamp - stillSince > 200) {
+      if (sample.timestamp - stillSince > 100) {
         fusion.applyZUPT();
         zuptCount++;
       }

@@ -31,8 +31,7 @@ describe("Recorder integration with real sensor data", () => {
 
     const result = recorder.stop();
 
-    expect(result.reps.length).toBeGreaterThanOrEqual(5);
-    expect(result.reps.length).toBeLessThanOrEqual(15);
+    expect(result.reps.length).toBe(12);
 
     for (const rep of result.reps) {
       expect(rep.meanConcentricVelocity).toBeGreaterThan(0);

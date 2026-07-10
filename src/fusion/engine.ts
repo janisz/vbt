@@ -1,22 +1,24 @@
 import type { SensorSample, FusedSample, Vec3, Quaternion } from "../types.js";
-import {
-  IDENTITY,
-  qFromGravity,
-  qNormalize,
-  qMultiply,
-  qFromAxisAngle,
-  qRotateVec3,
-  qSlerp,
-  qToEuler,
-} from "../math/quaternion.js";
-
-const ALPHA = 0.97;
+import AHRS from "ahrs";
+import KalmanFilter from "kalmanjs";
+import { IDENTITY, qFromGravity, qRotateVec3, qToEuler } from "../math/quaternion.js";
 
 export class FusionEngine {
+  private ahrs: AHRS;
+  private kfX: KalmanFilter;
+  private kfY: KalmanFilter;
+  private kfZ: KalmanFilter;
   private orientation: Quaternion = IDENTITY;
   private velocity: Vec3 = { x: 0, y: 0, z: 0 };
   private position: Vec3 = { x: 0, y: 0, z: 0 };
   private lastTimestamp: number | null = null;
+
+  constructor() {
+    this.ahrs = new AHRS({ sampleInterval: 16, algorithm: "Madgwick", beta: 0.4 });
+    this.kfX = new KalmanFilter({ R: 1, Q: 3 });
+    this.kfY = new KalmanFilter({ R: 1, Q: 3 });
+    this.kfZ = new KalmanFilter({ R: 1, Q: 3 });
+  }
 
   process(sample: SensorSample): FusedSample {
     const dt =
@@ -25,9 +27,27 @@ export class FusionEngine {
         : 0;
     this.lastTimestamp = sample.timestamp;
 
-    this.updateOrientation(sample, dt);
+    if (dt > 0) {
+      const g = sample.accelerationWithGravity;
+      const r = sample.rotationRate;
+      this.ahrs.update(r.x, r.y, r.z, g.x / 9.81, g.y / 9.81, g.z / 9.81, undefined, undefined, undefined, dt);
+      const q = this.ahrs.getQuaternion();
+      if (!isNaN(q.w)) {
+        this.orientation = { w: q.w, x: q.x, y: q.y, z: q.z };
+      } else {
+        this.orientation = qFromGravity(sample.accelerationWithGravity);
+        this.ahrs = new AHRS({ sampleInterval: 16, algorithm: "Madgwick", beta: 0.4 });
+      }
+    } else {
+      this.orientation = qFromGravity(sample.accelerationWithGravity);
+    }
 
-    const worldAccel = qRotateVec3(this.orientation, sample.acceleration);
+    const worldAccelRaw = qRotateVec3(this.orientation, sample.acceleration);
+    const worldAccel: Vec3 = {
+      x: this.kfX.filter(worldAccelRaw.x),
+      y: this.kfY.filter(worldAccelRaw.y),
+      z: this.kfZ.filter(worldAccelRaw.z),
+    };
 
     if (dt > 0) {
       this.velocity.x += worldAccel.x * dt;
@@ -56,36 +76,13 @@ export class FusionEngine {
   }
 
   reset(): void {
+    this.ahrs = new AHRS({ sampleInterval: 16, algorithm: "Madgwick", beta: 0.4 });
+    this.kfX = new KalmanFilter({ R: 1, Q: 3 });
+    this.kfY = new KalmanFilter({ R: 1, Q: 3 });
+    this.kfZ = new KalmanFilter({ R: 1, Q: 3 });
     this.orientation = IDENTITY;
     this.velocity = { x: 0, y: 0, z: 0 };
     this.position = { x: 0, y: 0, z: 0 };
     this.lastTimestamp = null;
-  }
-
-  private updateOrientation(sample: SensorSample, dt: number): void {
-    const gravityQ = qFromGravity(sample.accelerationWithGravity);
-
-    if (dt > 0) {
-      const rr = sample.rotationRate;
-      const angle = Math.sqrt(rr.x * rr.x + rr.y * rr.y + rr.z * rr.z) * dt;
-      if (angle > 1e-8) {
-        const axis: Vec3 = {
-          x: rr.x / (angle / dt),
-          y: rr.y / (angle / dt),
-          z: rr.z / (angle / dt),
-        };
-        const gyroQ = qMultiply(
-          this.orientation,
-          qFromAxisAngle(axis, angle),
-        );
-        this.orientation = qNormalize(qSlerp(gravityQ, gyroQ, ALPHA));
-      } else {
-        this.orientation = qNormalize(
-          qSlerp(gravityQ, this.orientation, ALPHA),
-        );
-      }
-    } else {
-      this.orientation = gravityQ;
-    }
   }
 }
