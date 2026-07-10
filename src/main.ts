@@ -17,6 +17,10 @@ async function init() {
   router.on("results", (params) => renderResults(app, router, params));
 
   router.navigate("home");
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js");
+  }
 }
 
 init();
