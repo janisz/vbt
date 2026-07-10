@@ -20,6 +20,7 @@ export class Recorder {
   private repCallbacks: Array<(rep: RepAnalysis) => void> = [];
   private lastMovementTime: number | null = null;
   private startTime: number | null = null;
+  private stillSince: number | null = null;
 
   start(phaseOrder: PhaseOrder): void {
     this.fusion.reset();
@@ -30,6 +31,7 @@ export class Recorder {
     this.recording = true;
     this.lastMovementTime = null;
     this.startTime = null;
+    this.stillSince = null;
   }
 
   stop(): SetAnalysis {
@@ -41,6 +43,22 @@ export class Recorder {
     if (!this.recording || !this.detector) return;
 
     if (this.startTime === null) this.startTime = sample.timestamp;
+
+    const accelMag = Math.sqrt(
+      sample.acceleration.x ** 2 +
+      sample.acceleration.y ** 2 +
+      sample.acceleration.z ** 2,
+    );
+
+    // Stillness-based ZUPT: prevent velocity drift from accelerometer noise
+    if (accelMag < 0.3) {
+      if (this.stillSince === null) this.stillSince = sample.timestamp;
+      if (sample.timestamp - this.stillSince > 200) {
+        this.fusion.applyZUPT();
+      }
+    } else {
+      this.stillSince = null;
+    }
 
     const fused = this.fusion.process(sample);
     this.samples.push(fused);

@@ -11,6 +11,7 @@ export async function renderHome(
   container.innerHTML = `
     <h1>VBT</h1>
     <button class="btn-accent" id="start-session">Start Session</button>
+    <button class="btn-secondary mt-8" id="sensor-debug">Sensor Debug</button>
     <div class="mt-16">
       <h2>History</h2>
       ${
@@ -32,6 +33,10 @@ export async function renderHome(
   container
     .querySelector("#start-session")!
     .addEventListener("click", () => router.navigate("exercise-select"));
+
+  container
+    .querySelector("#sensor-debug")!
+    .addEventListener("click", () => router.navigate("debug"));
 
   container.querySelectorAll(".session-item").forEach((el) => {
     el.addEventListener("click", () => {
